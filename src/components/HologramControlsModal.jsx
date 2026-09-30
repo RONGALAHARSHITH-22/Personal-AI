@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sliders, Palette, Box, Sparkles, Eye, Camera, Upload, Volume2 } from 'lucide-react';
+import { X, Sliders, Palette, Box, Sparkles, Volume2, Upload } from 'lucide-react';
 import { audioSynth } from '../services/AudioSynth';
 import { speechService } from '../services/SpeechService';
 
@@ -11,7 +11,8 @@ export default function HologramControlsModal({
   onSelectColor,
   isWireframe,
   onToggleWireframe,
-  onSelectCameraPreset,
+  modelPreset = 'anime_3d',
+  onSelectModelPreset,
   customGlbUrl,
   onUpdateGlbUrl
 }) {
@@ -50,6 +51,11 @@ export default function HologramControlsModal({
     speechService.voiceRate = newRate;
   };
 
+  const modelOptions = [
+    { id: 'anime_3d', name: '✨ 3D Anime Holographic Waifu', desc: 'Procedural 3D anime companion with dynamic hair, eyes & lip-sync' },
+    { id: 'turntable_3d', name: '💫 360° Tripo Turntable Showcase', desc: 'Luma-keyed turntable holographic showcase with audio reactivity' }
+  ];
+
   return (
     <div style={{
       position: 'fixed',
@@ -74,6 +80,44 @@ export default function HologramControlsModal({
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}>
             <X size={20} />
           </button>
+        </div>
+
+        {/* Active 3D Model Preset */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <label style={{ fontSize: '0.8rem', fontFamily: 'var(--font-orbitron)', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Sparkles size={14} color={currentColor.hex} /> ACTIVE 3D AVATAR MODEL:
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {modelOptions.map((opt) => {
+              const isSelected = modelPreset === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => {
+                    audioSynth.playClickSound();
+                    onSelectModelPreset && onSelectModelPreset(opt.id);
+                  }}
+                  style={{
+                    background: isSelected ? `${currentColor.hex}22` : 'rgba(5, 8, 17, 0.6)',
+                    border: isSelected ? `1px solid ${currentColor.hex}` : '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: isSelected ? `0 0 12px ${currentColor.hex}33` : 'none'
+                  }}
+                >
+                  <div style={{ fontSize: '0.82rem', fontFamily: 'var(--font-orbitron)', color: isSelected ? currentColor.hex : 'var(--text-main)', fontWeight: 700 }}>
+                    {opt.name}
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginTop: '4px' }}>
+                    {opt.desc}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Color Palette Themes */}

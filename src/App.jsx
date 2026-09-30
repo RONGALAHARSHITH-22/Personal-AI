@@ -28,11 +28,12 @@ export default function App() {
   const [messages, setMessages] = useState([
     {
       sender: 'aura',
-      text: `Good day, Sir. I am **AURA**—Advanced User Responsive Assistant, modeled after the JARVIS holographic architecture.\n\nMy full-body 3D humanoid avatar, real-time vocal engine, autonomous task execution protocols, and cyber synth dance kinematics are online and standing by. You can speak to me, issue computer automation tasks, play cyber beats, or command me to dance in 360° space!`
+      text: `Good day, Sir! I am **AURA**—your futuristic 3D Anime Holographic Companion & JARVIS Assistant.\n\nMy 3D anime avatar, real-time vocal engine, autonomous task protocols, and cyber synth choreography are online and calibrated. You can command me to switch models, change holographic color matrices, dance to cyber beats, execute system diagnostics, or toggle wireframe mode!`
     }
   ]);
 
   const [isThinking, setIsThinking] = useState(false);
+  const [modelPreset, setModelPreset] = useState('anime_3d');
   const [currentColor, setCurrentColor] = useState(COLOR_THEMES[0]);
   const [isWireframe, setIsWireframe] = useState(false);
   const [customGlbUrl, setCustomGlbUrl] = useState(null);
@@ -126,7 +127,7 @@ export default function App() {
     };
   }, []);
 
-  // Handle User Message from Chat or Voice
+  // Handle User Message from Chat or Voice with direct command execution
   const handleSendMessage = async (userText) => {
     if (!userText.trim()) return;
 
@@ -134,28 +135,148 @@ export default function App() {
     setIsThinking(true);
     setAvatarState('thinking');
 
-    const lower = userText.toLowerCase();
+    const lower = userText.toLowerCase().trim();
+    let actionExecuted = false;
+    let customAuraReply = '';
 
-    // Check for Dance directive
-    if (lower.includes('dance') || lower.includes('groove') || lower.includes('beat')) {
-      let targetStyle = 'freestyle';
-      if (lower.includes('hip hop') || lower.includes('hip-hop')) targetStyle = 'hip_hop';
-      if (lower.includes('cinematic') || lower.includes('ballet')) targetStyle = 'cinematic';
+    // 1. Model Preset Switching
+    if (lower.includes('anime') || lower.includes('waifu') || lower.includes('girl model') || lower.includes('companion model')) {
+      setModelPreset('anime_3d');
+      setAvatarState('celebrating');
+      customAuraReply = "Affirmative, Sir! Engaging **3D Anime Companion avatar matrix**. Dynamic hair physics, expressive eye-blink kinematics, and cute cyber mascot companion are online.";
+      actionExecuted = true;
+    } else if (lower.includes('turntable') || lower.includes('360 showcase') || lower.includes('turntable model')) {
+      setModelPreset('turntable_3d');
+      setAvatarState('talking');
+      customAuraReply = "Switching to **360° Holographic Turntable Showcase matrix**. Audio-reactive spatial projection active.";
+      actionExecuted = true;
+    }
+
+    // 2. Color Theme Switching
+    if (lower.includes('cyan') || (lower.includes('color') && lower.includes('default'))) {
+      const th = COLOR_THEMES.find(c => c.id === 'cyan');
+      if (th) { setCurrentColor(th); customAuraReply += (customAuraReply ? "\n\n" : "") + "Holographic emitter recalibrated to **AURA Quantum Cyan**."; actionExecuted = true; }
+    } else if (lower.includes('crimson') || lower.includes('red theme') || lower.includes('red color') || lower.includes('mark-l') || lower.includes('mark l') || lower.includes('red')) {
+      const th = COLOR_THEMES.find(c => c.id === 'crimson');
+      if (th) { setCurrentColor(th); customAuraReply += (customAuraReply ? "\n\n" : "") + "Holographic emitter shifted to **Mark-L Crimson**."; actionExecuted = true; }
+    } else if (lower.includes('emerald') || lower.includes('green theme') || lower.includes('green color') || lower.includes('tesseract') || lower.includes('green')) {
+      const th = COLOR_THEMES.find(c => c.id === 'emerald');
+      if (th) { setCurrentColor(th); customAuraReply += (customAuraReply ? "\n\n" : "") + "Holographic emitter frequency shifted to **Tesseract Emerald**."; actionExecuted = true; }
+    } else if (lower.includes('gold') || lower.includes('yellow theme') || lower.includes('yellow color') || lower.includes('stark arc') || lower.includes('yellow') || lower.includes('orange')) {
+      const th = COLOR_THEMES.find(c => c.id === 'gold');
+      if (th) { setCurrentColor(th); customAuraReply += (customAuraReply ? "\n\n" : "") + "Holographic emitter tuned to **Stark Arc Gold**."; actionExecuted = true; }
+    } else if (lower.includes('violet') || lower.includes('purple') || lower.includes('celestial')) {
+      const th = COLOR_THEMES.find(c => c.id === 'violet');
+      if (th) { setCurrentColor(th); customAuraReply += (customAuraReply ? "\n\n" : "") + "Holographic optical matrix shifted to **Celestial Violet**."; actionExecuted = true; }
+    } else if (lower.includes('blue') || lower.includes('cobalt')) {
+      const th = COLOR_THEMES.find(c => c.id === 'blue');
+      if (th) { setCurrentColor(th); customAuraReply += (customAuraReply ? "\n\n" : "") + "Holographic matrix recalibrated to **JARVIS Deep Cobalt**."; actionExecuted = true; }
+    }
+
+    // 3. Wireframe Matrix Toggle
+    if (lower.includes('wireframe') || lower.includes('mesh mode') || lower.includes('wire frame') || lower.includes('wireframe matrix')) {
+      setIsWireframe(prev => {
+        const next = !prev;
+        customAuraReply += (customAuraReply ? "\n\n" : "") + (next ? "Wireframe polygonal mesh matrix **ENGAGED**." : "Wireframe matrix disabled. Restoring **SOLID HOLOGRAPHIC SURFACE**.");
+        return next;
+      });
+      actionExecuted = true;
+    }
+
+    // 4. Music & Dance Control
+    if (lower.includes('stop dancing') || lower.includes('stop music') || lower.includes('stop beat') || lower === 'stop' || lower.includes('pause music') || lower.includes('be quiet') || lower.includes('silence') || lower.includes('shut up')) {
+      musicService.stop();
+      speechService.stopSpeaking();
+      setAvatarState('idle');
+      customAuraReply = "Stopping all cyber beat audio playback and returning 3D avatar to **STANDBY IDLE** mode, Sir.";
+      actionExecuted = true;
+    } else if (lower.includes('dance') || lower.includes('groove') || lower.includes('beat') || lower.includes('play music')) {
+      let targetStyle = 'hip_hop';
+      if (lower.includes('freestyle') || lower.includes('spin')) targetStyle = 'freestyle';
+      if (lower.includes('cinematic') || lower.includes('ballet') || lower.includes('graceful')) targetStyle = 'cinematic';
       
       setDanceStyle(targetStyle);
       musicService.setDanceStyle(targetStyle);
-      musicService.playPresetBeat(targetStyle === 'hip_hop' ? 'cyber_house' : targetStyle === 'cinematic' ? 'cinematic_pulse' : 'lofi_chill');
+      const beatName = targetStyle === 'hip_hop' ? 'cyber_house' : targetStyle === 'cinematic' ? 'cinematic_pulse' : 'lofi_chill';
+      musicService.playPresetBeat(beatName);
       setAvatarState('dancing');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + `Engaging full-body 3D **${targetStyle.toUpperCase().replace('_', '-')}** choreography synchronized with the audio spectrum!`;
+      actionExecuted = true;
     }
 
-    // Check for Celebration directive
-    if (lower.includes('celebrate') || lower.includes('victory') || lower.includes('won') || lower.includes('congrat')) {
-      confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+    // 5. Celebration
+    if (lower.includes('celebrate') || lower.includes('victory') || lower.includes('won') || lower.includes('congrat') || lower.includes('party')) {
+      confetti({ particleCount: 110, spread: 85, origin: { y: 0.6 } });
       setAvatarState('celebrating');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Mission success confirmed! Holographic particle fireworks deployed in celebration, Sir!";
+      actionExecuted = true;
     }
 
+    // 6. View Mode Switching
+    if (lower.includes('stage view') || lower.includes('3d stage') || lower.includes('fullscreen 3d')) {
+      setViewMode('stage');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Switching display interface to **3D STAGE FOCUS** view.";
+      actionExecuted = true;
+    } else if (lower.includes('task view') || lower.includes('agent tasks') || lower.includes('protocols view')) {
+      setViewMode('tasks');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Switching to **AUTONOMOUS AGENT TASK PROTOCOLS** view.";
+      actionExecuted = true;
+    } else if (lower.includes('dashboard') || lower.includes('split view')) {
+      setViewMode('split');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Reverting HUD layout to **MAIN SPLIT DASHBOARD**.";
+      actionExecuted = true;
+    } else if (lower.includes('chat view')) {
+      setViewMode('chat');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Expanding **NEURAL DIALOGUE STREAM** view.";
+      actionExecuted = true;
+    }
+
+    // 7. Holographic Hum
+    if (lower.includes('turn on hum') || lower.includes('enable hum') || lower.includes('start hum')) {
+      audioSynth.toggleHologramHum(true);
+      setIsHumActive(true);
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Holographic sub-bass ambient hum activated.";
+      actionExecuted = true;
+    } else if (lower.includes('turn off hum') || lower.includes('mute hum') || lower.includes('disable hum')) {
+      audioSynth.toggleHologramHum(false);
+      setIsHumActive(false);
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Holographic ambient hum silenced.";
+      actionExecuted = true;
+    }
+
+    // 8. Agent Task Protocols
+    if (lower.includes('diagnos') || lower.includes('system health') || lower.includes('run diagnostics')) {
+      handleLaunchAgentTask('Run full system telemetry diagnostics');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Autonomous diagnostic protocol initiated. Inspecting CPU, memory, and WebGL telemetry pipelines.";
+      actionExecuted = true;
+    } else if (lower.includes('generate script') || lower.includes('write code') || lower.includes('create script')) {
+      handleLaunchAgentTask('Synthesize Python code script');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Code generation protocol launched. Neural workspace is synthesizing verified script architecture.";
+      actionExecuted = true;
+    } else if (lower.includes('summarize docs') || lower.includes('summarize document')) {
+      handleLaunchAgentTask('Summarize system telemetry document');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Document summarization pipeline engaged. Extracting semantic highlights.";
+      actionExecuted = true;
+    } else if (lower.includes('browser automation') || lower.includes('open browser') || lower.includes('open docs')) {
+      handleLaunchAgentTask('Open approved browser docs portal');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Launching browser automation sequence.";
+      actionExecuted = true;
+    } else if (lower.includes('create report') || lower.includes('mission briefing')) {
+      handleLaunchAgentTask('Create mission briefing report file');
+      customAuraReply = (customAuraReply ? customAuraReply + "\n\n" : "") + "Compiling mission briefing report.";
+      actionExecuted = true;
+    }
+
+    // If a direct command was fulfilled, respond and speak immediately
+    if (actionExecuted && customAuraReply) {
+      setIsThinking(false);
+      setMessages(prev => [...prev, { sender: 'aura', text: customAuraReply }]);
+      speechService.speak(customAuraReply);
+      return;
+    }
+
+    // Otherwise, generate conversational AI response
     try {
-      // Send to FastAPI /api/chat or fallback LLM service
       let replyText = '';
       try {
         const res = await fetch('/api/chat', {
@@ -191,6 +312,7 @@ export default function App() {
       setMessages(prev => [...prev, { sender: 'aura', text: `System anomaly: ${e.message}` }]);
     }
   };
+
 
   // Launch Autonomous Agent Task
   const handleLaunchAgentTask = (taskPrompt) => {
@@ -246,17 +368,6 @@ export default function App() {
               <div className="hud-corner-tl" />
               <div className="hud-corner-br" />
 
-              {/* Status Header Badge */}
-              <div style={{ position: 'absolute', top: '14px', left: '16px', right: '16px', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(5,8,17,0.75)', padding: '6px 12px', borderRadius: '6px', border: `1px solid ${currentColor.hex}33` }}>
-                <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-orbitron)', color: currentColor.hex, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="pulse-dot" style={{ backgroundColor: currentColor.hex }} />
-                  AURA 3D FULL-BODY MATRIX // {avatarState.toUpperCase()}
-                </span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
-                  360° SKELETAL RIGGING
-                </span>
-              </div>
-
               {/* Real 3D Full-Body Hologram Canvas */}
               <AuraFullBodyAvatar
                 colorHex={currentColor.hex}
@@ -266,6 +377,8 @@ export default function App() {
                 audioLevel={audioLevel}
                 musicAudio={musicTelemetry}
                 isWireframe={isWireframe}
+                modelPreset={modelPreset}
+                onSelectModelPreset={setModelPreset}
                 customGlbUrl={customGlbUrl}
               />
 
@@ -281,9 +394,13 @@ export default function App() {
             <AuraMusicDeck
               currentDanceStyle={danceStyle}
               onSelectDanceStyle={setDanceStyle}
-              onAvatarDanceTrigger={(style) => {
-                setDanceStyle(style);
-                setAvatarState('dancing');
+              onAvatarDanceTrigger={(actionOrStyle) => {
+                if (actionOrStyle === 'idle') {
+                  setAvatarState('idle');
+                } else {
+                  setDanceStyle(actionOrStyle);
+                  setAvatarState('dancing');
+                }
               }}
               colorHex={currentColor.hex}
             />
@@ -332,6 +449,8 @@ export default function App() {
               audioLevel={audioLevel}
               musicAudio={musicTelemetry}
               isWireframe={isWireframe}
+              modelPreset={modelPreset}
+              onSelectModelPreset={setModelPreset}
               customGlbUrl={customGlbUrl}
             />
 
@@ -345,9 +464,13 @@ export default function App() {
           <AuraMusicDeck
             currentDanceStyle={danceStyle}
             onSelectDanceStyle={setDanceStyle}
-            onAvatarDanceTrigger={(style) => {
-              setDanceStyle(style);
-              setAvatarState('dancing');
+            onAvatarDanceTrigger={(actionOrStyle) => {
+              if (actionOrStyle === 'idle') {
+                setAvatarState('idle');
+              } else {
+                setDanceStyle(actionOrStyle);
+                setAvatarState('dancing');
+              }
             }}
             colorHex={currentColor.hex}
           />
@@ -387,6 +510,8 @@ export default function App() {
               audioLevel={audioLevel}
               musicAudio={musicTelemetry}
               isWireframe={isWireframe}
+              modelPreset={modelPreset}
+              onSelectModelPreset={setModelPreset}
               customGlbUrl={customGlbUrl}
             />
           </div>
@@ -431,9 +556,12 @@ export default function App() {
         onSelectColor={setCurrentColor}
         isWireframe={isWireframe}
         onToggleWireframe={() => setIsWireframe(prev => !prev)}
+        modelPreset={modelPreset}
+        onSelectModelPreset={setModelPreset}
         customGlbUrl={customGlbUrl}
         onUpdateGlbUrl={setCustomGlbUrl}
       />
     </div>
   );
 }
+
