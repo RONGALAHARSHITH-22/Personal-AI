@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  aura:
+    build: .
+    container_name: aura-personal-ai
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - REQUIRE_CONFIRMATION_FOR_DESTRUCTIVE_ACTIONS=true
+    restart: unless-stopped

@@ -7,6 +7,7 @@ import json
 from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 try:
@@ -316,6 +317,11 @@ def generate_aura_response(prompt: str, avatar_state: str, dance_style: Optional
 
     # Default natural conversational response
     return f"Acknowledged, Sir. Processing your instruction: '{prompt}'. Holographic projection matrix and neural subroutines are calibrated and standing by for your next directive."
+
+# Mount frontend production build if present (for single-container production deployment)
+dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
+if os.path.exists(dist_dir) and os.path.isdir(dist_dir):
+    app.mount("/", StaticFiles(directory=dist_dir, html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
